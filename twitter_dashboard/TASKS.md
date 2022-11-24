@@ -4,3 +4,8 @@
 2. Set up application infrastructure
     * Create backend Flask
     * Create frontend React
+
+
+# Resources
+Tweepy API v2 Example
+https://dev.to/twitterdev/a-comprehensive-guide-for-using-the-twitter-api-v2-using-tweepy-in-python-15d9
