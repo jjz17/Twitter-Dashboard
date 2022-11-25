@@ -13,3 +13,10 @@ Snscrape Example (Scrape global tweet data)
 https://python.plainenglish.io/how-to-scrape-everything-from-twitter-using-python-b91eae5e4614
 
 https://stackoverflow.com/questions/872565/remove-sensitive-files-and-their-commits-from-git-history
+
+
+git filter-branch --force --index-filter \
+  "git rm --cached --ignore-unmatch twitter_dashboard/.env" \
+  --prune-empty --tag-name-filter cat -- --all
+  git push --force --verbose --dry-run
+  git push --force
