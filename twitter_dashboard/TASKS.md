@@ -9,3 +9,6 @@
 # Resources
 Tweepy API v2 Example
 https://dev.to/twitterdev/a-comprehensive-guide-for-using-the-twitter-api-v2-using-tweepy-in-python-15d9
+Snscrape Example (Scrape global tweet data)
+https://python.plainenglish.io/how-to-scrape-everything-from-twitter-using-python-b91eae5e4614
+
