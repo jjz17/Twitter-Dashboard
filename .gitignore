@@ -19,6 +19,9 @@ junit-pytest.xml
 # virtualenv
 .venv/
 
+# environment variables (API keys)
+.env
+
 # mypy
 .mypy_cache/
 
