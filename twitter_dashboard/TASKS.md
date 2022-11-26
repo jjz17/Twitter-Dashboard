@@ -14,7 +14,7 @@ https://python.plainenglish.io/how-to-scrape-everything-from-twitter-using-pytho
 
 https://stackoverflow.com/questions/872565/remove-sensitive-files-and-their-commits-from-git-history
 
-
+# Git command to remove .env from all git history locally and in remote repo
 git filter-branch --force --index-filter \
   "git rm --cached --ignore-unmatch twitter_dashboard/.env" \
   --prune-empty --tag-name-filter cat -- --all
