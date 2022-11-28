@@ -1,5 +1,6 @@
 import pymongo
 from pymongo import MongoClient
+import tweepy
 
 import json
 from typing import List, Dict
@@ -12,12 +13,12 @@ class MongoStore:
         self.database = self.client[database_name]
         self.collection = self.database[collection_name]
 
-    def save_tweets(self):
+    def save_tweets(self, tweets: List[tweepy.models.Status]):
         """
         Save the extracted tweets to the Mongo database.
         """
 
-        for i, status in enumerate(self.tweets):
+        for i, status in enumerate(tweets):
             user = status.user
             print(f"{i+1}. {user.screen_name}")
             self.collection.update_one(
@@ -26,12 +27,12 @@ class MongoStore:
                 upsert=True,
             )
 
-    def load_mongo_data(self) -> List[Dict[str:str, str:json]]:
+    def load_mongo_data(self) -> List[Dict[str, str]]:
         """
         Load tweet data from the Mongo database.
 
         Returns:
-            List[Dict[str: str, str: json]]: a list of dicts with user's names and respective tweets
+            List[Dict[str, str]]: a list of dicts with user's names and respective tweets
         """
         data = []
         for document in self.collection.find():
