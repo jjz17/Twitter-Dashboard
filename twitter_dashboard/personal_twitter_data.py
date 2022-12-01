@@ -3,6 +3,7 @@ from tweepy import OAuthHandler
 from dotenv import load_dotenv
 
 import os
+import json
 
 
 # Store keys and tokens for tweepy
@@ -50,3 +51,10 @@ class TweetLoader:
         new_tweets = tweepy.Cursor(self.api.home_timeline).items(count)
         # Add tweets to TweetLoader storage
         self.tweets.extend(new_tweets)
+
+
+    def get_loaded_tweets_as_json(self):
+        """
+        Return the loaded tweets as a JSON object
+        """
+        return [tweet._json for tweet in self.tweets]

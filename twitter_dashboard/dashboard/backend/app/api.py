@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from twitter_dashboard.personal_twitter_data import TweetLoader
+from twitter_dashboard.mongo_data import MongoStore
+
 
 app = FastAPI()
 
@@ -18,6 +21,9 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+loader = TweetLoader()
+store = MongoStore("twitter_dashboard_db", "home_timeline")
+
 todos = [
     {
         "id": "1",
@@ -32,6 +38,18 @@ todos = [
         "item": "Increase in Faith, Hope, and Charity."
     }
 ]
+
+# Example using path parameters (required)
+# @app.get("/load-tweets/{n_tweets}", tags=["tweets"])
+# async def get_tweets(n_tweets: int) -> dict:
+#     return loader.extract_tweets(count=n_tweets)
+
+
+# Example using query parameters (not required)
+@app.get("/load-tweets", tags=["tweets"])
+async def get_tweets(n_tweets: int = 5) -> list:
+    loader.extract_tweets(count=n_tweets)
+    return loader.get_loaded_tweets_as_json()
 
 
 @app.get("/", tags=["root"])
