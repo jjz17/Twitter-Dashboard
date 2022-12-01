@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { ChakraProvider } from "@chakra-ui/react";
+
+import Tweets from "./components/Tweets";
 import PokemonList from './PokemonList'
 import axios from 'axios'
 import Pagination from './Pagination';
@@ -37,11 +40,14 @@ function App() {
 
   return (
     <>
+    <ChakraProvider>
+      <Tweets />
       <PokemonList pokemon={pokemon} />
       <Pagination
         gotoNextPage={nextPageUrl ? gotoNextPage : null}
         gotoPrevPage={prevPageUrl ? gotoPrevPage : null}
       />
+    </ChakraProvider>
     </>
   );
 }
