@@ -137,6 +137,21 @@ function TweetHelper({ text, id, fetchTweets }) {
     )
 }
 
+interface Location {
+    long: number;
+    lat: number;
+    /**
+     * Description for altitude field
+     */
+    altitude: number | undefined;
+}
+
+interface TweetProps {
+    id: number;
+    text: string;
+    location: Location
+}
+
 
 export default function Tweets() {
     const [tweets, setTweets] = useState([])
