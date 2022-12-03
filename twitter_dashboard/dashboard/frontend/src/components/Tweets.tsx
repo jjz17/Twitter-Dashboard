@@ -25,11 +25,11 @@ function AddTweet() {
     const [text, setItem] = React.useState("")
     const { tweets, fetchTweets } = React.useContext(TweetsContext)
 
-    const handleInput = event => {
-        setItem(event.target.value)
+    const handleInput = (evt: any) => {
+        setItem(evt.target.value)
     }
 
-    const handleSubmit = (event) => {
+    const handleSubmit = (evt: any) => {
         const newTweet = {
             "id": tweets.length + 1,
             "text": text
@@ -57,7 +57,7 @@ function AddTweet() {
     )
 }
 
-function UpdateTweet({ text, id }) {
+function UpdateTweet({text, id}: { text: string, id: number }) {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [tweet, setTweet] = useState(text)
     const { fetchTweets } = React.useContext(TweetsContext)

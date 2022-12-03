@@ -1,18 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { Counter } from "./Counter";
 
 function App() {
-    const [tweet, setTweet] = useState("First tweet")
+    const [description, setDescription] = useState("Example description")
 
 
     return (
         <div className="App">
-            <input onChange={(evt) => {
+            <input value={description} onChange={(evt) => {
                 console.log(evt.target.value);
+                setDescription(evt.target.value)
             }} />
+
+            <Counter description={description} defaultCount={10}/>
         </div>
     )
 }
-
 
 
 export default App;
