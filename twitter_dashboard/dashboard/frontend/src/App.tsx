@@ -2,6 +2,25 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+// type JSONValue =
+async function loadTweets() {
+  const url = "http://localhost:8000/load-tweets";
+  const response = await fetch(url);
+  let data = ""
+  if (response.ok) {
+    data = await response.text()
+  }
+  else {
+    console.log("Error HTTP: " + response.status) 
+  }
+  
+  const tweets = JSON.parse(data)
+  return tweets
+}
+
+const tweets = loadTweets();
+console.log(tweets)
+
 function App() {
   return (
     <div className="App">
@@ -19,6 +38,9 @@ function App() {
           Learn React
         </a>
       </header>
+      {/* <div>
+        {tweets.map(tweet => <h3></h3>)}
+      </div> */}
     </div>
   );
 }
