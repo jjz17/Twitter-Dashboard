@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 const url = "http://localhost:8000/load-tweets";
@@ -25,27 +24,44 @@ function App() {
       .catch(err => setError(err))
   }, [])
 
-  console.log(data)
+  // console.log(data)
+  data.map(user_data => {
+    console.log(user_data.user)
+    user_data.tweets.map((tweet: any) => {
+      console.log(tweet.text)
+    });
+  })
 
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
       <div>
         <ul>
-          {data.map(user_data => <li key={user_data.user}>{user_data.tweets[0].text}</li>)}
+          <>
+          {/* {data.map(user_data => <li key={user_data.user}>{user_data.tweets[0].text}</li>)} */}
+          {data.map(user_data => {
+            // console.log(user_data.user)
+            user_data.tweets.map((tweet: any) => {
+              <li>tweet.text</li>
+            });
+          })}
+
+
+
+          {data.map(user_data => {
+            return (
+              <>
+                <h4>User : {user_data.user}</h4>
+                {user_data.tweets.map((tweet: any) => {
+                  return (
+                    <li>{tweet.text}</li>
+                  )
+                })}
+              </>
+            );
+          })}
+
+          </>
+
         </ul>
       </div>
     </div>
