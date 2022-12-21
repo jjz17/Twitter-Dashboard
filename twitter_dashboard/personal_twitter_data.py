@@ -29,7 +29,7 @@ class TweetLoader:
         self.tweets = []
 
     
-    def extract_tweets(self, count: int = 100):
+    def extract_tweets(self, count: int = 100) -> None:
         """
         Extract the given number of tweets from the Twitter home timeline,
         number of tweets requested must be [1,100].
@@ -55,6 +55,6 @@ class TweetLoader:
 
     def get_loaded_tweets_as_json(self):
         """
-        Return the loaded tweets as a JSON object
+        Return the loaded tweets as a list of JSON objects
         """
         return [tweet._json for tweet in self.tweets]
