@@ -1,27 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-// type JSONValue =
-async function loadTweets() {
-  const url = "http://localhost:8000/load-tweets";
-  const response = await fetch(url);
-  let data = ""
-  if (response.ok) {
-    data = await response.text()
-  }
-  else {
-    console.log("Error HTTP: " + response.status) 
-  }
-  
-  const tweets = JSON.parse(data)
-  return tweets
-}
-
-const tweets = loadTweets();
-console.log(tweets)
+const url = "http://localhost:8000/load-tweets";
+const url2 = "http://localhost:8000/todo";
+const url3 = "http://localhost:8000/load-mongo";
 
 function App() {
+  const [todos, setTodos] = useState<Todo[]>([])
+  const [data, setData] = useState<any[]>([])
+  const [error, setError] = useState({})
+
+  interface Todo {
+    id: string;
+    item: string;
+  }
+
+  useEffect(() => {
+    // fetch('https://jsonplaceholder.typicode.com/todos')
+    fetch(url3)
+      .then(response => response.json())
+      // .then(res => console.log(res))
+      .then(res => setData(res))
+      .catch(err => setError(err))
+  }, [])
+
+  console.log(data)
+
   return (
     <div className="App">
       <header className="App-header">
@@ -38,9 +43,11 @@ function App() {
           Learn React
         </a>
       </header>
-      {/* <div>
-        {tweets.map(tweet => <h3></h3>)}
-      </div> */}
+      <div>
+        <ul>
+          {data.map(user_data => <li key={user_data.user}>{user_data.tweets[0].text}</li>)}
+        </ul>
+      </div>
     </div>
   );
 }

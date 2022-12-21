@@ -52,6 +52,12 @@ async def get_tweets(n_tweets: int = 5) -> list:
     return loader.get_loaded_tweets_as_json()
 
 
+@app.get("/load-mongo", tags=["tweets"])
+async def get_mongo_data() -> dict:
+    return store.load_mongo_data()
+
+
+
 @app.get("/", tags=["root"])
 async def read_root() -> dict:
     return {"message": "Welcome to your todo list."}
