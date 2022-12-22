@@ -37,31 +37,26 @@ function App() {
       <div>
         <ul>
           <>
-          {/* {data.map(user_data => <li key={user_data.user}>{user_data.tweets[0].text}</li>)} */}
-          {data.map(user_data => {
-            // console.log(user_data.user)
-            user_data.tweets.map((tweet: any) => {
-              <li>tweet.text</li>
-            });
-          })}
-
-
-
-          {data.map(user_data => {
-            return (
-              <>
-                <h4>User : {user_data.user}</h4>
-                {user_data.tweets.map((tweet: any) => {
-                  return (
-                    <li>{tweet.text}</li>
-                  )
-                })}
-              </>
-            );
-          })}
-
+            {/* {data.map(user_data => <li key={user_data.user}>{user_data.tweets[0].text}</li>)} */}
+            {data.map(user_data => {
+              // console.log(user_data.user)
+              user_data.tweets.map((tweet: any) => {
+                <li>tweet.text</li>
+              });
+            })}
+            {data.map(user_data => {
+              return (
+                <>
+                  <h4>User : {user_data.user}</h4>
+                  {user_data.tweets.map((tweet: any) => {
+                    return (
+                      <li>{tweet.text}</li>
+                    )
+                  })}
+                </>
+              );
+            })}
           </>
-
         </ul>
       </div>
     </div>
