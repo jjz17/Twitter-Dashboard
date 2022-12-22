@@ -17,6 +17,8 @@ class MongoStore:
         Save the extracted tweets to the Mongo database.
         """
 
+        # TODO: order tweets by oldest to newest
+
         for i, status in enumerate(tweets):
             user = status.user
             print(f"{i+1}. {user.screen_name}")
@@ -27,7 +29,11 @@ class MongoStore:
             )
 
     def load_data(
-        self, users: Optional[List[str]] = None, n_tweets: Optional[int] = None
+        self,
+        users: Optional[List[str]] = None,
+        n_tweets: Optional[int] = None,
+        n_user_tweets: Optional[int] = None,
+        latest: bool = False,
     ) -> List[Dict[str, Union[str, List[dict]]]]:
         """
         Load tweet data from the Mongo database.
@@ -38,16 +44,31 @@ class MongoStore:
         data = []
         tweets_count = 0
         for document in self.collection.find():
-            # If number of tweets requested is reached
-            if n_tweets and tweets_count >= n_tweets:
-                break
-            if users:
-                if document["user"] in users:
-                    data.append(
-                        {"user": document["user"], "tweets": document["tweets"]}
-                    )
-                    tweets_count += 1
-            else:
-                data.append({"user": document["user"], "tweets": document["tweets"]})
+
+            user = document["user"]
+            tweets = document["tweets"]
+
+            # Skip user if not in users
+            if users and user not in users:
+                continue
+
+            user_data = {"user": user, "tweets": []}
+            user_tweets_count = 0
+
+            if latest:
+                tweets = tweets[::-1]
+
+            for tweet in tweets:
+                # If number of tweets requested per user or total is reached
+                if (n_tweets and tweets_count >= n_tweets) or (
+                    n_user_tweets and user_tweets_count >= n_user_tweets
+                ):
+                    break
+
+                user_data["tweets"].append(tweet)
                 tweets_count += 1
+                user_tweets_count += 1
+
+            data.append(user_data)
+
         return data
