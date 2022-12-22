@@ -19,6 +19,9 @@ junit-pytest.xml
 # virtualenv
 .venv/
 
+# environment variables (API keys)
+twitter_dashboard/.env
+
 # mypy
 .mypy_cache/
 
