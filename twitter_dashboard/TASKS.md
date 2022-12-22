@@ -7,6 +7,10 @@
         * Endpoint(s) for extracting data from mongo
         * Endpoint for running sentiment analysis on a tweet
     * Create frontend React
+        * Multi check box on right for users to include
+        * Integer input for number of tweets to load
+        * Integer input and submit button to retrieve given number of tweets from timeline and save
+        * List of users with tweets displayed on left (with scroll if too long)
 
 
 # Resources

@@ -3,7 +3,7 @@ from pymongo import MongoClient
 import tweepy
 
 import json
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 
 
 class MongoStore:
@@ -26,7 +26,9 @@ class MongoStore:
                 upsert=True,
             )
 
-    def load_data(self) -> List[Dict[str, Union[str, List[dict]]]]:
+    def load_data(
+        self, users: Optional[List[str]] = None, n_tweets: Optional[int] = None
+    ) -> List[Dict[str, Union[str, List[dict]]]]:
         """
         Load tweet data from the Mongo database.
 
@@ -34,6 +36,18 @@ class MongoStore:
             List[Dict[str, Union[str, List[dict]]]]: a list of dicts with user's names and respective tweets
         """
         data = []
+        tweets_count = 0
         for document in self.collection.find():
-            data.append({"user": document["user"], "tweets": document["tweets"]})
+            # If number of tweets requested is reached
+            if n_tweets and tweets_count >= n_tweets:
+                break
+            if users:
+                if document["user"] in users:
+                    data.append(
+                        {"user": document["user"], "tweets": document["tweets"]}
+                    )
+                    tweets_count += 1
+            else:
+                data.append({"user": document["user"], "tweets": document["tweets"]})
+                tweets_count += 1
         return data
