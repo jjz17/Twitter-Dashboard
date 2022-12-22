@@ -15,7 +15,9 @@ ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 ACCESS_TOKEN_SECRET = os.getenv("ACCESS_TOKEN_SECRET")
 BEARER_TOKEN = os.getenv("BEARER_TOKEN")
 
-auth = OAuthHandler(CONSUMER_KEY, CONSUMER_KEY_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+auth = OAuthHandler(
+    CONSUMER_KEY, CONSUMER_KEY_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET
+)
 # auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 
 
@@ -28,7 +30,6 @@ class TweetLoader:
         self.api = tweepy.API(auth)
         self.tweets = []
 
-    
     def extract_tweets(self, count: int = 100) -> None:
         """
         Extract the given number of tweets from the Twitter home timeline,
@@ -51,7 +52,6 @@ class TweetLoader:
         new_tweets = tweepy.Cursor(self.api.home_timeline).items(count)
         # Add tweets to TweetLoader storage
         self.tweets.extend(new_tweets)
-
 
     def get_loaded_tweets_as_json(self):
         """

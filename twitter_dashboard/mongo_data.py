@@ -7,13 +7,12 @@ from typing import List, Dict, Union
 
 
 class MongoStore:
-
     def __init__(self, database_name: str, collection_name: str) -> None:
         self.client = MongoClient()
         self.database = self.client[database_name]
         self.collection = self.database[collection_name]
 
-    def save_tweets(self, tweets: List[tweepy.models.Status]):
+    def save_tweets_to_db(self, tweets: List[tweepy.models.Status]):
         """
         Save the extracted tweets to the Mongo database.
         """
@@ -27,7 +26,7 @@ class MongoStore:
                 upsert=True,
             )
 
-    def load_mongo_data(self) -> List[Dict[str, Union[str, List[dict]]]]:
+    def load_data(self) -> List[Dict[str, Union[str, List[dict]]]]:
         """
         Load tweet data from the Mongo database.
 

@@ -7,10 +7,7 @@ from twitter_dashboard.mongo_data import MongoStore
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:3000",
-    "localhost:3000"
-]
+origins = ["http://localhost:3000", "localhost:3000"]
 
 
 app.add_middleware(
@@ -18,25 +15,16 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
 loader = TweetLoader()
 store = MongoStore("twitter_dashboard_db", "home_timeline")
 
 todos = [
-    {
-        "id": "1",
-        "item": "Read a book."
-    },
-    {
-        "id": "2",
-        "item": "Cycle around town."
-    },
-    {
-        "id": "3",
-        "item": "Increase in Faith, Hope, and Charity."
-    }
+    {"id": "1", "item": "Read a book."},
+    {"id": "2", "item": "Cycle around town."},
+    {"id": "3", "item": "Increase in Faith, Hope, and Charity."},
 ]
 
 # Example using path parameters (required)
@@ -54,8 +42,7 @@ async def get_tweets(n_tweets: int = 5) -> list:
 
 @app.get("/load-mongo", tags=["tweets"])
 async def get_mongo_data() -> dict:
-    return store.load_mongo_data()
-
+    return store.load_data()
 
 
 @app.get("/", tags=["root"])
@@ -65,20 +52,16 @@ async def read_root() -> dict:
 
 @app.get("/todo", tags=["todos"])
 async def get_todos() -> dict:
-    return { "data": todos }
+    return {"data": todos}
 
 
 @app.post("/todo", tags=["todos"])
 async def add_todo(todo: dict) -> dict:
     # Check if todo to add is a duplicate
     if todo in todos:
-        return {
-            "data": { "Error: duplicate Todo" }
-        }
+        return {"data": {"Error: duplicate Todo"}}
     todos.append(todo)
-    return {
-        "data": { "Todo added." }
-    }
+    return {"data": {"Todo added."}}
 
 
 @app.put("/todo/{id}", tags=["todos"])
@@ -86,13 +69,9 @@ async def update_todo(id: int, body: dict) -> dict:
     for todo in todos:
         if int(todo["id"]) == id:
             todo["item"] = body["item"]
-            return {
-                "data": f"Todo with id {id} has been updated."
-            }
+            return {"data": f"Todo with id {id} has been updated."}
 
-    return {
-        "data": f"Todo with id {id} not found."
-    }
+    return {"data": f"Todo with id {id} not found."}
 
 
 @app.delete("/todo/{id}", tags=["todos"])
@@ -100,10 +79,6 @@ async def delete_todo(id: int) -> dict:
     for todo in todos:
         if int(todo["id"]) == id:
             todos.remove(todo)
-            return {
-                "data": f"Todo with id {id} has been removed."
-            }
+            return {"data": f"Todo with id {id} has been removed."}
 
-    return {
-        "data": f"Todo with id {id} not found."
-    }
+    return {"data": f"Todo with id {id} not found."}
