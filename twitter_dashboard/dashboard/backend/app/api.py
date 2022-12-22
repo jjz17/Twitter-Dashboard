@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from twitter_dashboard.personal_twitter_data import TweetLoader
 from twitter_dashboard.mongo_data import MongoStore
 
+from typing import List, Optional
+
 
 app = FastAPI()
 
@@ -41,8 +43,15 @@ async def get_tweets(n_tweets: int = 5) -> list:
 
 
 @app.get("/load-mongo", tags=["tweets"])
-async def get_mongo_data() -> dict:
-    return store.load_data()
+async def get_mongo_data(
+    users: List[str] = None,
+    n_tweets: Optional[int] = None,
+    n_user_tweets: Optional[int] = None,
+    latest: bool = False,
+) -> dict:
+    return store.load_data(
+        users=users, n_tweets=n_tweets, n_user_tweets=n_user_tweets, latest=latest
+    )
 
 
 @app.get("/", tags=["root"])
