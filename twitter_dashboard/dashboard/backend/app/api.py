@@ -36,14 +36,41 @@ todos = [
 
 
 # Example using query parameters (not required)
-@app.get("/load-tweets", tags=["tweets"])
-async def get_tweets(n_tweets: int = 5) -> list:
+@app.get("/extract-tweets", tags=["tweets"])
+async def extract_tweets(n_tweets: int = 5) -> list:
     loader.extract_tweets(count=n_tweets)
     return loader.get_loaded_tweets_as_json()
 
 
-@app.get("/load-mongo", tags=["tweets"])
-async def get_mongo_data(
+"""
+Example curl commands
+
+curl -X GET http://localhost:8000/save-tweets \  
+    -H 'Content-Type: application/json'
+
+
+curl -X POST http://localhost:8000/todo -d \    
+    '{"id": "3", "item": "Buy some testdriven courses."}' \
+    -H 'Content-Type: application/json'
+"""
+
+
+@app.get("/save-tweets")
+async def save_tweets() -> str:
+    try:
+        store.save_tweets_to_db(loader.get_loaded_tweets_as_json())
+        return "Saved successfully"
+    except:
+        return "Failed to save"
+
+
+"""
+Example queries:
+
+/mongo-tweets?n_tweets=20&n_user_tweets=5&latest=true
+"""
+@app.get("/mongo-tweets", tags=["tweets"])
+async def mongo_tweets(
     users: List[str] = None,
     n_tweets: Optional[int] = None,
     n_user_tweets: Optional[int] = None,

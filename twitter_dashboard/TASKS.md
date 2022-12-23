@@ -1,11 +1,11 @@
-1. Set up basic data infrastructure
-    * Create service to extract Twitter data (using tweepy)
-    * Create service to store and retrieve data from MongoDB
+1. Improve data save and retrieval
+    * Don't add duplicate tweets in `MongoStore.save_tweets_to_db` or create function to drop duplicates (by tweet id?)
+    * Look into Tweepy streaming api
 2. Set up application infrastructure
     * Create backend FastAPI
-        * Endpoint(s) for exacting twitter data (and storing in mongo) 
-        * Endpoint(s) for extracting data from mongo
-        * Endpoint for running sentiment analysis on a tweet
+        * endpoint to load data from mongo
+        * endpoint to extract tweets from twitter (and display in react app)
+        * endpoint to save extracted tweets to mongo
     * Create frontend React
         * Multi check box on right for users to include
         * Integer input for number of tweets to load

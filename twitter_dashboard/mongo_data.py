@@ -1,6 +1,7 @@
 import pymongo
 from pymongo import MongoClient
 import tweepy
+from datetime import datetime
 
 import json
 from typing import List, Dict, Union, Optional
@@ -17,16 +18,37 @@ class MongoStore:
         Save the extracted tweets to the Mongo database.
         """
 
+        def get_datetime(tweet: tweepy.models.Status) -> datetime:
+            dt = tweet.created_at
+            tokens = dt.split()
+            date_info = tokens[1:4] + tokens[5:]
+            date_info = " ".join(date_info)
+            return datetime.strptime(date_info, "%b %d %H:%M:%S %Y")
+
+
         # TODO: order tweets by oldest to newest
+
+        tweets = sorted(tweets, key=lambda x: x.created_at)
+        # tweets = sorted(tweets, key=get_datetime)
 
         for i, status in enumerate(tweets):
             user = status.user
             print(f"{i+1}. {user.screen_name}")
-            self.collection.update_one(
-                {"user": user.screen_name},
-                {"$push": {"tweets": status._json}},
-                upsert=True,
+            self.collection.insert_one(
+                status._json
             )
+
+
+        # for i, status in enumerate(tweets):
+        #     user = status.user
+        #     print(f"{i+1}. {user.screen_name}")
+        #     self.collection.update_one(
+        #         {"user": user.screen_name},
+        #         {"$addToSet": {"tweets": status.id}},
+        #         # {"$push": {"tweets": status._json}},
+        #         upsert=True,
+        #     )
+    
 
     def load_data(
         self,

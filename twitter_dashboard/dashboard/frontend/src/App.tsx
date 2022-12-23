@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-const url = "http://localhost:8000/load-tweets";
-const url2 = "http://localhost:8000/todo";
-const url3 = "http://localhost:8000/load-mongo";
+const extract_url = "http://localhost:8000/extract-tweets";
+const mongo_url = "http://localhost:8000/mongo-tweets";
 
 function App() {
   const [todos, setTodos] = useState<Todo[]>([])
@@ -17,7 +16,7 @@ function App() {
 
   useEffect(() => {
     // fetch('https://jsonplaceholder.typicode.com/todos')
-    fetch(url3)
+    fetch(mongo_url)
       .then(response => response.json())
       // .then(res => console.log(res))
       .then(res => setData(res))
@@ -35,11 +34,12 @@ function App() {
   return (
     <div className="App">
       <div>
+        Hello
+      </div>
+      <div>
         <ul>
           <>
-            {/* {data.map(user_data => <li key={user_data.user}>{user_data.tweets[0].text}</li>)} */}
             {data.map(user_data => {
-              // console.log(user_data.user)
               user_data.tweets.map((tweet: any) => {
                 <li>tweet.text</li>
               });
@@ -50,7 +50,7 @@ function App() {
                   <h4>User : {user_data.user}</h4>
                   {user_data.tweets.map((tweet: any) => {
                     return (
-                      <li>{tweet.text}</li>
+                      <li>{tweet}</li>
                     )
                   })}
                 </>

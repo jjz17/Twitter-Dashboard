@@ -33,20 +33,20 @@ class TweetLoader:
     def extract_tweets(self, count: int = 100) -> None:
         """
         Extract the given number of tweets from the Twitter home timeline,
-        number of tweets requested must be [1,100].
+        number of tweets requested must be [1,200].
 
         Args:
             count (int, optional):
-                number of tweets to extract, defaults to 100
+                number of tweets to extract, defaults to 200
 
         Raises:
             TypeError: if count is not an int
-            ValueError: if count is not [1, 100]
+            ValueError: if count is not [1, 200]
         """
         if not isinstance(count, int):
             raise TypeError("Count must be an integer")
-        if count < 1 or count > 100:
-            raise ValueError("Count must be between 1 and 100, inclusive")
+        if count < 1 or count > 200:
+            raise ValueError("Count must be between 1 and 200, inclusive")
 
         # Extract tweets
         new_tweets = tweepy.Cursor(self.api.home_timeline).items(count)
