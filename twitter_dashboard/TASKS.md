@@ -1,5 +1,6 @@
 1. Improve data save and retrieval
     * Don't add duplicate tweets in `MongoStore.save_tweets_to_db` or create function to drop duplicates (by tweet id?)
+        * Load all tweets as individual documents, create index on screen_name, use group by, distinct, filter queries
     * Look into Tweepy streaming api
 2. Set up application infrastructure
     * Create backend FastAPI
@@ -7,6 +8,7 @@
         * endpoint to extract tweets from twitter (and display in react app)
         * endpoint to save extracted tweets to mongo
     * Create frontend React
+        * Use MaterialUI framework!!
         * Multi check box on right for users to include
         * Integer input for number of tweets to load
         * Integer input and submit button to retrieve given number of tweets from timeline and save

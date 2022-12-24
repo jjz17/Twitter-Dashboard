@@ -48,6 +48,13 @@ class MongoStore:
         #         # {"$push": {"tweets": status._json}},
         #         upsert=True,
         #     )
+
+
+    def load_flat_data(self):
+        data = []
+        for document in self.collection.find():
+            data.append(document)
+        return data
     
 
     def load_data(
