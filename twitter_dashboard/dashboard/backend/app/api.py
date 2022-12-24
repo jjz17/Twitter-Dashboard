@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from twitter_dashboard.personal_twitter_data import TweetLoader
-from twitter_dashboard.mongo_data import MongoStore
+from twitter_dashboard.mongo_data import MongoTweetStore
 
 from typing import List, Optional
 
@@ -21,7 +21,7 @@ app.add_middleware(
 )
 
 loader = TweetLoader()
-store = MongoStore("twitter_dashboard_db", "home_timeline")
+store = MongoTweetStore("twitter_dashboard_db", "home_timeline")
 
 todos = [
     {"id": "1", "item": "Read a book."},
@@ -69,6 +69,8 @@ Example queries:
 
 /mongo-tweets?n_tweets=20&n_user_tweets=5&latest=true
 """
+
+
 @app.get("/mongo-tweets", tags=["tweets"])
 async def mongo_tweets(
     users: List[str] = None,

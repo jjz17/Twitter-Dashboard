@@ -7,58 +7,39 @@ import json
 from typing import List, Dict, Union, Optional
 
 
-class MongoStore:
+class MongoTweetStore:
     def __init__(self, database_name: str, collection_name: str) -> None:
         self.client = MongoClient()
         self.database = self.client[database_name]
         self.collection = self.database[collection_name]
+        self.collection.create_index(
+            [("id", pymongo.ASCENDING)],
+            name="tweet_id",
+            unique=True,
+            default_language="english",
+        )
 
     def save_tweets_to_db(self, tweets: List[tweepy.models.Status]):
         """
         Save the extracted tweets to the Mongo database.
         """
 
-        def get_datetime(tweet: tweepy.models.Status) -> datetime:
-            dt = tweet.created_at
-            tokens = dt.split()
-            date_info = tokens[1:4] + tokens[5:]
-            date_info = " ".join(date_info)
-            return datetime.strptime(date_info, "%b %d %H:%M:%S %Y")
-
-
-        # TODO: order tweets by oldest to newest
-
+        # Order tweets by oldest to newest
         tweets = sorted(tweets, key=lambda x: x.created_at)
-        # tweets = sorted(tweets, key=get_datetime)
 
         for i, tweet in enumerate(tweets):
             try:
                 user = tweet.user
-                print(f"{i+1}. {user}")
-                self.collection.insert_one(
-                    tweet._json
-                )
+                print(f"{i+1}. {user.name}")
+                self.collection.insert_one(tweet._json)
             except pymongo.errors.DuplicateKeyError:
-                print("Duplicate tweet")
-
-
-        # for i, status in enumerate(tweets):
-        #     user = status.user
-        #     print(f"{i+1}. {user.screen_name}")
-        #     self.collection.update_one(
-        #         {"user": user.screen_name},
-        #         {"$addToSet": {"tweets": status.id}},
-        #         # {"$push": {"tweets": status._json}},
-        #         upsert=True,
-        #     )
-
+                print(f"Duplicate tweet id: {tweet.id}")
 
     def load_flat_data(self):
         data = []
         for document in self.collection.find():
             data.append(document)
         return data
-    
 
     def load_data(
         self,
