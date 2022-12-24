@@ -30,15 +30,63 @@ class MongoTweetStore:
         for i, tweet in enumerate(tweets):
             try:
                 user = tweet.user
-                print(f"{i+1}. {user.name}")
+                print(f"{i+1}. {user.screen_name}")
                 self.collection.insert_one(tweet._json)
             except pymongo.errors.DuplicateKeyError:
                 print(f"Duplicate tweet id: {tweet.id}")
 
     def load_flat_data(self):
+        """
+        Load all documents (tweets) as a list from Mongo
+        """
         data = []
         for document in self.collection.find():
             data.append(document)
+        return data
+
+    def load_data(
+        self,
+        users: Optional[List[str]] = None,
+        n_tweets: Optional[int] = None,
+        n_user_tweets: Optional[int] = None,
+        latest: bool = False,
+    ) -> List[Dict[str, Union[str, List[dict]]]]:
+        """
+        Load tweet data from the Mongo database.
+
+        Returns:
+            List[Dict[str, Union[str, List[dict]]]]: a list of dicts with user's names and respective tweets
+        """
+        data = []
+        tweets_count = 0
+        if users:
+            tweets = self.collection.find({"user.screen_name": {"$in": users}})
+        else:
+            tweets = self.collection.find()
+
+        # Group by user
+
+        for document in tweets:
+
+            user = document["user"]
+            user_tweets_count = 0
+
+            if latest:
+                tweets = tweets[::-1]
+
+            for tweet in tweets:
+                # If number of tweets requested per user or total is reached
+                if (n_tweets and tweets_count >= n_tweets) or (
+                    n_user_tweets and user_tweets_count >= n_user_tweets
+                ):
+                    break
+
+                user_data["tweets"].append(tweet)
+                tweets_count += 1
+                user_tweets_count += 1
+
+            data.append(user_data)
+
         return data
 
     def load_data(
