@@ -31,12 +31,15 @@ class MongoStore:
         tweets = sorted(tweets, key=lambda x: x.created_at)
         # tweets = sorted(tweets, key=get_datetime)
 
-        for i, status in enumerate(tweets):
-            user = status.user
-            print(f"{i+1}. {user.screen_name}")
-            self.collection.insert_one(
-                status._json
-            )
+        for i, tweet in enumerate(tweets):
+            try:
+                user = tweet.user
+                print(f"{i+1}. {user}")
+                self.collection.insert_one(
+                    tweet._json
+                )
+            except pymongo.errors.DuplicateKeyError:
+                print("Duplicate tweet")
 
 
         # for i, status in enumerate(tweets):
