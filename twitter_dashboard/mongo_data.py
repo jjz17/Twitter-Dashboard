@@ -44,7 +44,7 @@ class MongoTweetStore:
             data.append(document)
         return data
 
-    def load_data(
+    def load_data_test(
         self,
         users: Optional[List[str]] = None,
         n_tweets: Optional[int] = None,
