@@ -57,37 +57,42 @@ class MongoTweetStore:
         Returns:
             List[Dict[str, Union[str, List[dict]]]]: a list of dicts with user's names and respective tweets
         """
-        data = []
+        pipeline = [
+            # Filter only requested users
+            {"$match": {"user.screen_name": {"$in": users}}},
+            # Group tweets by user
+            {
+                "$group": {
+                    "_id": "$user.screen_name",
+                    "docs": {"$push": "$$ROOT"}
+                    },
+            },
+        ]
+
+        data = self.collection.aggregate(pipeline)
+        # print_documents(data)
+
+        # Order alphabetically by name (Mongo doesn't return in specific order)
+        data = sorted(data, key=lambda x: x["_id"].lower())
+
         tweets_count = 0
-        if users:
-            tweets = self.collection.find({"user.screen_name": {"$in": users}})
-        else:
-            tweets = self.collection.find()
+        for group in data:
+            if tweets_count >= n_tweets:
+                break
 
-        # Group by user
+            tweets = group["docs"]
+            print(group["_id"])
 
-        for document in tweets:
+            if len(tweets) > n_tweets - tweets_count:
+                tweets = tweets[: n_tweets - tweets_count]
 
-            user = document["user"]
-            user_tweets_count = 0
+            if n_user_tweets:
+                tweets = tweets[:n_user_tweets]
+                # print(group["docs"])
+                # print(len(group["docs"]))
+                print(len(tweets))
 
-            if latest:
-                tweets = tweets[::-1]
-
-            for tweet in tweets:
-                # If number of tweets requested per user or total is reached
-                if (n_tweets and tweets_count >= n_tweets) or (
-                    n_user_tweets and user_tweets_count >= n_user_tweets
-                ):
-                    break
-
-                user_data["tweets"].append(tweet)
-                tweets_count += 1
-                user_tweets_count += 1
-
-            data.append(user_data)
-
-        return data
+            tweets_count += len(tweets)
 
     def load_data(
         self,
