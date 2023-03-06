@@ -3,7 +3,7 @@ from pymongo import MongoClient
 import tweepy
 from datetime import datetime
 
-from sentiment_analysis import SentimentAnalyzer
+from twitter_dashboard.sentiment_analysis import SentimentAnalyzer
 
 import json
 from typing import List, Dict, Union, Optional
@@ -27,7 +27,9 @@ class MongoTweetStore:
             default_language="english",
         )
 
-    def save_tweets_to_db(self, tweets: List[tweepy.models.Status], model: SentimentAnalyzer):
+    def save_tweets_to_db(
+        self, tweets: List[tweepy.models.Status], model: SentimentAnalyzer
+    ):
         """
         Analyze sentiment and save the extracted tweets to the Mongo database.
         """
@@ -54,7 +56,7 @@ class MongoTweetStore:
             data.append(document)
         return data
 
-    def load_data_test(
+    def load_data(
         self,
         users: Optional[List[str]] = None,
         n_tweets: Optional[int] = None,
@@ -78,7 +80,9 @@ class MongoTweetStore:
 
         if groupby_user:
             # Group tweets by user
-            pipeline.append({"$group": {"_id": "$user.screen_name", "docs": {"$push": "$$ROOT"}}})
+            pipeline.append(
+                {"$group": {"_id": "$user.screen_name", "docs": {"$push": "$$ROOT"}}}
+            )
 
         # data is a list of dicts (username : list of tweets/dicts)
         data = list(self.collection.aggregate(pipeline))
@@ -119,7 +123,7 @@ class MongoTweetStore:
                 if latest:
                     tweets = tweets[::-1]
                 truncated_data[user["_id"]] = tweets
-        
+
         # If not groupby user, ignore n_user_tweets
         else:
             data = sorted(data, key=lambda x: x["user"]["screen_name"].lower())
@@ -133,9 +137,15 @@ class MongoTweetStore:
                 else:
                     truncated_data[username].append(tweet)
 
+        # Remove _id fields
+        for l in truncated_data.values():
+            for i in l:
+                i.pop("_id")
+
+
         return truncated_data
 
-    def load_data(
+    def load_data_old(
         self,
         users: Optional[List[str]] = None,
         n_tweets: Optional[int] = None,
@@ -183,4 +193,6 @@ class MongoTweetStore:
 
 if __name__ == "__main__":
     store = MongoTweetStore("twitter_dashboard_db", "home_timeline")
-    data = store.load_data_test(users=["business", "Forbes"], n_tweets=100, n_user_tweets=100)
+    data = store.load_data(
+        users=["business", "Forbes"], n_tweets=100, n_user_tweets=100
+    )

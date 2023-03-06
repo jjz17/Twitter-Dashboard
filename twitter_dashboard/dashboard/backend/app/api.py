@@ -29,19 +29,6 @@ todos = [
     {"id": "3", "item": "Increase in Faith, Hope, and Charity."},
 ]
 
-# Example using path parameters (required)
-# @app.get("/load-tweets/{n_tweets}", tags=["tweets"])
-# async def get_tweets(n_tweets: int) -> dict:
-#     return loader.extract_tweets(count=n_tweets)
-
-
-# Example using query parameters (not required)
-@app.get("/extract-tweets", tags=["tweets"])
-async def extract_tweets(n_tweets: int = 5) -> list:
-    loader.extract_tweets(count=n_tweets)
-    return loader.get_loaded_tweets_as_json()
-
-
 """
 Example curl commands
 
@@ -53,6 +40,18 @@ curl -X POST http://localhost:8000/todo -d \
     '{"id": "3", "item": "Buy some testdriven courses."}' \
     -H 'Content-Type: application/json'
 """
+
+# Example using path parameters (required)
+# @app.get("/load-tweets/{n_tweets}", tags=["tweets"])
+# async def get_tweets(n_tweets: int) -> dict:
+#     return loader.extract_tweets(count=n_tweets)
+
+
+# Example using query parameters (not required)
+@app.get("/extract-tweets", tags=["tweets"])
+async def extract_tweets(n_tweets: int = 5) -> list:
+    loader.extract_tweets(count=n_tweets)
+    return loader.get_loaded_tweets_as_json()
 
 
 @app.get("/save-tweets")
@@ -76,10 +75,12 @@ async def mongo_tweets(
     users: List[str] = None,
     n_tweets: Optional[int] = None,
     n_user_tweets: Optional[int] = None,
+    groupby_user: bool = True,
     latest: bool = False,
 ) -> dict:
+    # return [{"a": ["b", "c"]}, 1, {"a": [100, "c"]}]
     return store.load_data(
-        users=users, n_tweets=n_tweets, n_user_tweets=n_user_tweets, latest=latest
+        users=users, n_tweets=n_tweets, n_user_tweets=n_user_tweets, groupby_user=groupby_user, latest=latest
     )
 
 
