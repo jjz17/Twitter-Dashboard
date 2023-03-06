@@ -55,6 +55,6 @@ class TweetLoader:
 
     def get_loaded_tweets_as_json(self):
         """
-        Return the loaded tweets as a list of JSON objects
+        Return the loaded tweets as a list of Dict (JSON) objects
         """
         return [tweet._json for tweet in self.tweets]
