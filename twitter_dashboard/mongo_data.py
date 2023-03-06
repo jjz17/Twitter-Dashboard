@@ -55,6 +55,7 @@ class MongoTweetStore:
         users: Optional[List[str]] = None,
         n_tweets: Optional[int] = None,
         n_user_tweets: Optional[int] = None,
+        groupby_user: bool = True,
         latest: bool = False,
     ) -> List[Dict[str, Union[str, List[dict]]]]:
         """
@@ -65,53 +66,69 @@ class MongoTweetStore:
         Returns:
             List[Dict[str, Union[str, List[dict]]]]: a list of dicts with user's names and respective tweets
         """
-        pipeline = [
-            # Group tweets by user
-            {
-                "$group": {"_id": "$user.screen_name", "docs": {"$push": "$$ROOT"}},
-            },
-        ]
+        pipeline = []
 
         if users:
             # Add filter for requested users
-            pipeline.insert(0, {"$match": {"user.screen_name": {"$in": users}}})
+            pipeline.append({"$match": {"user.screen_name": {"$in": users}}})
+
+        if groupby_user:
+            # Group tweets by user
+            pipeline.append({"$group": {"_id": "$user.screen_name", "docs": {"$push": "$$ROOT"}}})
 
         # data is a list of dicts (username : list of tweets/dicts)
         data = list(self.collection.aggregate(pipeline))
 
-        # Order alphabetically by username (Mongo doesn't return in specific order)
-        data = sorted(data, key=lambda x: x["_id"].lower())
         truncated_data = dict()
 
-        tweets_count = 0
-        for user in data:
-            # If no limit set for n_tweets:
-            if not n_tweets:
-                pass
-            elif tweets_count >= n_tweets:
-                break
+        # Order alphabetically by username (Mongo doesn't return in specific order)
+        # NOTE: May bias users with names in earlier alphabet if n_tweets restriction is added
+        if groupby_user:
+            data = sorted(data, key=lambda x: x["_id"].lower())
+            tweets_count = 0
 
-            tweets = user["docs"]
-            print(user["_id"])
+            for user in data:
+                # If no limit set for n_tweets:
+                if not n_tweets:
+                    pass
+                elif tweets_count >= n_tweets:
+                    break
 
-            # If no limit set for n_tweets:
-            if not n_tweets:
-                pass
-            elif len(tweets) > n_tweets - tweets_count:
-                tweets = tweets[: n_tweets - tweets_count]
+                tweets = user["docs"]
+                print(user["_id"])
 
-            # If there is a limit set for n_user_tweets:
-            if n_user_tweets:
-                tweets = tweets[:n_user_tweets]
-                # print(group["docs"])
-                # print(len(group["docs"]))
-                print(len(tweets))
+                # If no limit set for n_tweets:
+                if not n_tweets:
+                    pass
+                elif len(tweets) > n_tweets - tweets_count:
+                    tweets = tweets[: n_tweets - tweets_count]
 
-            tweets_count += len(tweets)
-            # Sort tweets by most recent to least recent
-            if latest:
-                tweets = tweets[::-1]
-            truncated_data[user["_id"]] = tweets
+                # If there is a limit set for n_user_tweets:
+                if n_user_tweets:
+                    tweets = tweets[:n_user_tweets]
+                    # print(group["docs"])
+                    # print(len(group["docs"]))
+                    print(len(tweets))
+
+                tweets_count += len(tweets)
+                # Sort tweets by most recent to least recent
+                if latest:
+                    tweets = tweets[::-1]
+                truncated_data[user["_id"]] = tweets
+        
+        # If not groupby user, ignore n_user_tweets
+        else:
+            data = sorted(data, key=lambda x: x["user"]["screen_name"].lower())
+            # Only return the number of tweets requested
+            data = data[:n_tweets]
+
+            for tweet in data:
+                username = tweet["user"]["screen_name"]
+                if username not in truncated_data:
+                    truncated_data[username] = [tweet]
+                else:
+                    truncated_data[username].append(tweet)
+
         return truncated_data
 
     def load_data(
