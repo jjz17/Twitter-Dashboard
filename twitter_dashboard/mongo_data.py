@@ -3,6 +3,8 @@ from pymongo import MongoClient
 import tweepy
 from datetime import datetime
 
+from sentiment_analysis import SentimentAnalyzer
+
 import json
 from typing import List, Dict, Union, Optional
 
@@ -25,21 +27,23 @@ class MongoTweetStore:
             default_language="english",
         )
 
-    def save_tweets_to_db(self, tweets: List[tweepy.models.Status]):
+    def save_tweets_to_db(self, tweets: List[tweepy.models.Status], model: SentimentAnalyzer):
         """
-        Save the extracted tweets to the Mongo database.
+        Analyze sentiment and save the extracted tweets to the Mongo database.
         """
 
         # Order tweets by oldest to newest
         tweets = sorted(tweets, key=lambda x: x.created_at)
 
-        for i, tweet in enumerate(tweets):
+        for i, status in enumerate(tweets):
             try:
-                user = tweet.user
+                user = status.user
                 print(f"{i+1}. {user.screen_name}")
-                self.collection.insert_one(tweet._json)
+                tweet = status._json
+                tweet["sentiment"] = int(model.analyze_sentiment(tweet["text"]))
+                self.collection.insert_one(tweet)
             except pymongo.errors.DuplicateKeyError:
-                print(f"Duplicate tweet id: {tweet.id}")
+                print(f"Duplicate tweet id: {status.id}")
 
     def load_flat_data(self):
         """
