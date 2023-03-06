@@ -6,6 +6,12 @@ from datetime import datetime
 import json
 from typing import List, Dict, Union, Optional
 
+"""
+Mongo Collection Schema Design:
+
+A flat collection of Tweet Status/JSON objects, uniquely indexed by object (document) ID and tweet ID
+"""
+
 
 class MongoTweetStore:
     def __init__(self, database_name: str, collection_name: str) -> None:
@@ -47,32 +53,33 @@ class MongoTweetStore:
     def load_data_test(
         self,
         users: Optional[List[str]] = None,
-        n_tweets: Optional[int] = None,
-        n_user_tweets: Optional[int] = None,
+        n_tweets: int = 0,
+        n_user_tweets: int = 0,
         latest: bool = False,
     ) -> List[Dict[str, Union[str, List[dict]]]]:
         """
         Load tweet data from the Mongo database.
 
+        Optional query parameters available
+
         Returns:
             List[Dict[str, Union[str, List[dict]]]]: a list of dicts with user's names and respective tweets
         """
         pipeline = [
-            # Filter only requested users
-            {"$match": {"user.screen_name": {"$in": users}}},
             # Group tweets by user
             {
-                "$group": {
-                    "_id": "$user.screen_name",
-                    "docs": {"$push": "$$ROOT"}
-                    },
+                "$group": {"_id": "$user.screen_name", "docs": {"$push": "$$ROOT"}},
             },
         ]
 
-        data = self.collection.aggregate(pipeline)
-        # print_documents(data)
+        if users:
+            # Add filter for requested users
+            pipeline.insert(0, {"$match": {"user.screen_name": {"$in": users}}})
 
-        # Order alphabetically by name (Mongo doesn't return in specific order)
+        # data is a list of dicts (username : list of tweets/dicts)
+        data = self.collection.aggregate(pipeline)
+
+        # Order alphabetically by username (Mongo doesn't return in specific order)
         data = sorted(data, key=lambda x: x["_id"].lower())
 
         tweets_count = 0
@@ -138,3 +145,8 @@ class MongoTweetStore:
             data.append(user_data)
 
         return data
+
+
+if __name__ == "__main__":
+    store = MongoTweetStore("twitter_dashboard_db", "home_timeline")
+    data = store.load_data_test(users=["business", "Forbes"], n_tweets=100, n_user_tweets=100)
