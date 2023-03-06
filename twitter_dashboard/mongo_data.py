@@ -53,8 +53,8 @@ class MongoTweetStore:
     def load_data_test(
         self,
         users: Optional[List[str]] = None,
-        n_tweets: int = 0,
-        n_user_tweets: int = 0,
+        n_tweets: Optional[int] = None,
+        n_user_tweets: Optional[int] = None,
         latest: bool = False,
     ) -> List[Dict[str, Union[str, List[dict]]]]:
         """
@@ -77,22 +77,30 @@ class MongoTweetStore:
             pipeline.insert(0, {"$match": {"user.screen_name": {"$in": users}}})
 
         # data is a list of dicts (username : list of tweets/dicts)
-        data = self.collection.aggregate(pipeline)
+        data = list(self.collection.aggregate(pipeline))
 
         # Order alphabetically by username (Mongo doesn't return in specific order)
         data = sorted(data, key=lambda x: x["_id"].lower())
+        truncated_data = dict()
 
         tweets_count = 0
-        for group in data:
-            if tweets_count >= n_tweets:
+        for user in data:
+            # If no limit set for n_tweets:
+            if not n_tweets:
+                pass
+            elif tweets_count >= n_tweets:
                 break
 
-            tweets = group["docs"]
-            print(group["_id"])
+            tweets = user["docs"]
+            print(user["_id"])
 
-            if len(tweets) > n_tweets - tweets_count:
+            # If no limit set for n_tweets:
+            if not n_tweets:
+                pass
+            elif len(tweets) > n_tweets - tweets_count:
                 tweets = tweets[: n_tweets - tweets_count]
 
+            # If there is a limit set for n_user_tweets:
             if n_user_tweets:
                 tweets = tweets[:n_user_tweets]
                 # print(group["docs"])
@@ -100,6 +108,11 @@ class MongoTweetStore:
                 print(len(tweets))
 
             tweets_count += len(tweets)
+            # Sort tweets by most recent to least recent
+            if latest:
+                tweets = tweets[::-1]
+            truncated_data[user["_id"]] = tweets
+        return truncated_data
 
     def load_data(
         self,
