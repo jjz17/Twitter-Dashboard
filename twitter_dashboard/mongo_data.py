@@ -87,7 +87,8 @@ class MongoTweetStore:
         # data is a list of dicts (username : list of tweets/dicts)
         data = list(self.collection.aggregate(pipeline))
 
-        truncated_data = dict()
+        # truncated_data = dict()
+        truncated_data = []
 
         # Order alphabetically by username (Mongo doesn't return in specific order)
         # NOTE: May bias users with names in earlier alphabet if n_tweets restriction is added
@@ -122,26 +123,27 @@ class MongoTweetStore:
                 # Sort tweets by most recent to least recent
                 if latest:
                     tweets = tweets[::-1]
-                truncated_data[user["_id"]] = tweets
+
+                for tweet in tweets:
+                    # Remove _id fields
+                    tweet.pop("_id")
+
+                truncated_data.append({"user": user["_id"], "tweets": tweets})
 
         # If not groupby user, ignore n_user_tweets
         else:
-            data = sorted(data, key=lambda x: x["user"]["screen_name"].lower())
             # Only return the number of tweets requested
             data = data[:n_tweets]
+            data = sorted(data, key=lambda x: x["user"]["screen_name"].lower())
 
             for tweet in data:
+                # Remove _id fields
+                tweet.pop("_id")
                 username = tweet["user"]["screen_name"]
-                if username not in truncated_data:
-                    truncated_data[username] = [tweet]
+                if len(truncated_data) == 0 or truncated_data[-1]["user"] != username:
+                    truncated_data.append({"user": username, "tweets": [tweet]})
                 else:
-                    truncated_data[username].append(tweet)
-
-        # Remove _id fields
-        for l in truncated_data.values():
-            for i in l:
-                i.pop("_id")
-
+                    truncated_data[-1]["tweets"].append(tweet)
 
         return truncated_data
 

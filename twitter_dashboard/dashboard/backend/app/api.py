@@ -78,7 +78,6 @@ async def mongo_tweets(
     groupby_user: bool = True,
     latest: bool = False,
 ) -> dict:
-    # return [{"a": ["b", "c"]}, 1, {"a": [100, "c"]}]
     return store.load_data(
         users=users, n_tweets=n_tweets, n_user_tweets=n_user_tweets, groupby_user=groupby_user, latest=latest
     )
