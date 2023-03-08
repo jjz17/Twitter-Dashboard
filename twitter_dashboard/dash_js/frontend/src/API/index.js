@@ -1,5 +1,5 @@
 const extract_url = "http://localhost:8000/extract-tweets";
-const mongo_url = "http://localhost:8000/mongo-tweets?n_tweets=2";
+const mongo_url = "http://localhost:8000/mongo-tweets?n_tweets=10";
 
 // export const getTweets = async () => {
 //     const res = await fetch(mongo_url);
